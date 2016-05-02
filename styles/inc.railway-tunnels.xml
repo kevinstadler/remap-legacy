@@ -1,0 +1,4 @@
+<Rule>
+    <Filter>[railway] = 'rail' and [tunnel] != null</Filter>
+    <LineSymbolizer stroke-linejoin="round" stroke="&railway-tunnel-stroke;" stroke-width="3" stroke-dasharray="6,5" />
+</Rule>

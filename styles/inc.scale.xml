@@ -1,0 +1,6 @@
+<Style name="scale">
+	<Rule>
+		<MinScaleDenominator>&minscale;</MinScaleDenominator>
+		<MaxScaleDenominator>&maxscale;</MaxScaleDenominator>
+	</Rule>
+</Style>

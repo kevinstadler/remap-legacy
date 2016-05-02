@@ -1,0 +1,3 @@
+<Rule><Filter>[highway] = 'footway' or [highway] = 'steps' or [highway] = 'service'</Filter>
+    <LineSymbolizer stroke="&stroke;" stroke-width="7" stroke-linejoin="&linejoin;" stroke-linecap="&linecap;" />
+</Rule>

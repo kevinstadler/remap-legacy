@@ -1,0 +1,6 @@
+<Rule><Filter>[highway] = 'steps'</Filter>
+	<LineSymbolizer stroke="#000" stroke-width="1" stroke-dasharray="1 1" />
+</Rule>
+<Rule><Filter>[highway] = 'footway' or [highway] = 'path' or [highway] = 'track'</Filter>
+	<LineSymbolizer stroke="#000" stroke-width="0.7" stroke-dasharray="3 3" />
+</Rule>

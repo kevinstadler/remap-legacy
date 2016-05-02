@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Map [
+<!ENTITY default-casing SYSTEM "remap.default-casing.inc.xml">
+<!ENTITY default-fill SYSTEM "remap.default-fill.inc.xml">
+
+<!ENTITY tunnel-casing SYSTEM "remap.tunnel-casing.inc.xml">
+<!ENTITY bridge-casing SYSTEM "remap.bridge-casing.inc.xml">
+
+<!ENTITY % entities SYSTEM "inc.xml">
+%entities;
+<!ENTITY minscale "3750">
+<!ENTITY maxscale "10000">
+<!ENTITY scale SYSTEM "inc.scale.xml">
+]>
+
+<!-- TODO hide private ways, [highway] = 'platform' or [railway] = 'platform' ? -->
+<Map background-color="#fff">
+	&fonts;
+	&scale;
+	<Style name="tunnels-casing" filter-mode="first">
+		<!-- ignore unnamed ways --> <!-- TODO ignore platforms too? -->
+		<Rule><Filter>[highway] = null or ([name] = null and [name:left] = null and [name:right] = null) or [tunnel] = null</Filter>
+			&hide;
+		</Rule>
+		&tunnel-casing;
+	</Style>
+
+	<Style name="tunnels-fill" filter-mode="first">
+		<Rule><Filter>[tunnel] = null</Filter>
+			&hide;
+		</Rule>
+
+		&railway-tunnels;
+		<!-- ignore unnamed ways --> <!-- TODO ignore platforms too? -->
+		<Rule><Filter>[highway] = null or ([name] = null and [name:left] = null and [name:right] = null)</Filter>
+			&hide;
+		</Rule>
+<!--		&highways-fill-closed;
+		&default-fill; -->
+	</Style>
+
+	<Style name="natural">
+		&natural;
+	</Style>
+
+	<Style name="highways-casing" filter-mode="first">
+		<!-- ignore unnamed ways --> <!-- TODO ignore platforms too? -->
+		<Rule><Filter>[highway] = null or ([name] = null and [name:left] = null and [name:right] = null) or [tunnel] != null or [bridge] != null</Filter>
+			&hide;
+		</Rule>
+		&highways-casing-closed;
+		&default-casing;
+	</Style>
+
+	<Style name="highways-fill" filter-mode="first">
+		<Rule><Filter>[tunnel] != null or [bridge] != null</Filter>
+			&hide;
+		</Rule>
+
+		&railway;
+
+		<!-- ignore unnamed ways -->
+		<Rule><Filter>[highway] = null or ([name] = null and [name:left] = null and [name:right] = null)</Filter>
+			&hide;
+		</Rule>
+
+		&highways-fill-closed;
+		&default-fill;
+	</Style>
+
+	<Style name="bridges-casing" filter-mode="first">
+		<!-- ignore unnamed ways -->
+		<Rule><Filter>[highway] = null or [name] = null or [bridge] = null</Filter>
+			&hide;
+		</Rule>
+
+		<!-- bridge casing should have a butt linecap in order to not stick out-->
+		&highways-casing-open;
+		&bridge-casing;
+	</Style>
+
+	<Style name="bridges-fill" filter-mode="first">
+		<Rule><Filter>[bridge] = null</Filter>
+			&hide;
+		</Rule>
+		&railway;
+
+		<!-- ignore unnamed ways -->
+		<Rule><Filter>[highway] = null or [name] = null or [bridge] = null</Filter>
+			&hide;
+		</Rule>
+		&highways-fill-open;
+		&default-fill;
+	</Style>
+
+	&names;
+</Map>

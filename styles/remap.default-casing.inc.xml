@@ -1,0 +1,4 @@
+<Rule><ElseFilter />
+    <LineSymbolizer stroke="&closed-casing-stroke;" stroke-width="6.5" stroke-linejoin="&linejoin;" stroke-linecap="&closed-linecap;" />
+    <!--LineSymbolizer stroke="&stroke;" stroke-width="7" stroke-linejoin="&linejoin;" stroke-linecap="&linecap;" offset="0.5" /-->
+</Rule>

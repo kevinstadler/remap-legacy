@@ -1,0 +1,5 @@
+<Rule>
+	<Filter>[railway] = 'rail'</Filter>
+	<LineSymbolizer stroke-linejoin="round" stroke="&railway-stroke;" stroke-width="3" />
+	<LineSymbolizer stroke-linejoin="round" stroke="#fff" stroke-width="1" stroke-dasharray="8,12" />
+</Rule>

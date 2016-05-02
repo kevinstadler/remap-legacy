@@ -1,0 +1,21 @@
+<!-- specifies rendering for all highways that are normally rendered with casing+fill (i.e. not 'service', 'footway', 'steps', 'path') -->
+
+<!-- TODO render (e.g. pedestrian) areas -->
+<!-- TODO render junction=roundabout -->
+<!-- TODO highway = pedestrian, motorway, motorway_link -->
+<Rule><Filter>[area] != null</Filter>
+	&hide;
+</Rule>
+
+<Rule><Filter>[highway] = 'primary' or [highway] = 'primary_link' or [highway] = 'secondary' or [highway] = 'secondary_link' or [highway] = 'trunk'</Filter>
+	<LineSymbolizer stroke="&fill-stroke;" stroke-width="10" stroke-linejoin="&linejoin;" stroke-linecap="&fill-linecap;" />
+</Rule>
+<Rule><Filter>[highway] = 'tertiary' or [highway] = 'tertiary_link' or [highway] = 'residential' or [highway] = 'unclassified'</Filter>
+	<LineSymbolizer stroke="&fill-stroke;" stroke-width="8" stroke-linejoin="&linejoin;" stroke-linecap="&fill-linecap;" />
+</Rule>
+<Rule><Filter>[highway] = 'pedestrian'</Filter>
+	<LineSymbolizer stroke="&fill-stroke;" stroke-width="7" stroke-linejoin="&linejoin;" stroke-linecap="&fill-linecap;" />
+</Rule>
+<Rule><Filter>([highway] = 'service' or [highway] = 'cycleway') and [access] = null and [private] = null</Filter>
+	<LineSymbolizer stroke="&fill-stroke;" stroke-width="5" stroke-linejoin="&linejoin;" stroke-linecap="&fill-linecap;" />
+</Rule>

@@ -1,0 +1,21 @@
+<!-- see inc.highways-fill.xml -->
+
+<Rule><Filter>[area] != null</Filter>
+	&hide;
+	<!--LineSymbolizer stroke="&closed-casing-stroke;" stroke-width="0.5" /-->
+</Rule>
+
+<!-- bridge casing should have a butt linecap in order to not stick out-->
+<Rule><Filter>[highway] = 'primary' or [highway] = 'primary_link' or [highway] = 'secondary' or [highway] = 'secondary_link' or [highway] = 'trunk'</Filter>
+	<LineSymbolizer stroke="&closed-casing-stroke;" stroke-width="11" stroke-linejoin="&linejoin;" stroke-linecap="&closed-linecap;" />
+</Rule>
+
+<Rule><Filter>[highway] = 'tertiary' or [highway] = 'tertiary_link' or [highway] = 'residential' or [highway] = 'unclassified'</Filter>
+	<LineSymbolizer stroke="&closed-casing-stroke;" stroke-width="9" stroke-linejoin="&linejoin;" stroke-linecap="&closed-linecap;" />
+</Rule>
+<Rule><Filter>[highway] = 'pedestrian'</Filter>
+	<LineSymbolizer stroke="&closed-casing-stroke;" stroke-width="8" stroke-linejoin="&linejoin;" stroke-linecap="&closed-linecap;" />
+</Rule>
+<Rule><Filter>([highway] = 'service' or [highway] = 'cycleway') and [access] = null and [private] = null</Filter>
+	<LineSymbolizer stroke="&closed-casing-stroke;" stroke-width="6" stroke-linejoin="&linejoin;" stroke-linecap="&closed-linecap;" />
+</Rule>

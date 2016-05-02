@@ -1,0 +1,38 @@
+<!-- default stroke colors, can be overridden within individual styles by defining it before loading inc.xml -->
+
+<!ENTITY closed-casing-stroke "#000">
+<!-- this one typically used for bridges -->
+<!ENTITY open-casing-stroke "#000">
+
+<!ENTITY fill-stroke "#fff">
+<!ENTITY railway-stroke "#777">
+<!ENTITY railway-tunnel-stroke "#aaa">
+<!ENTITY tunnel-dasharray "2,2,2">
+
+<!ENTITY linejoin "round">
+<!-- for closed linecaps: both caps should be "round", but butt will be used for bridges -->
+<!ENTITY closed-linecap "round">
+<!ENTITY fill-linecap "round">
+
+<!-- the open-fill-linecap is always "square", this just sets the one for casing -->
+<!ENTITY open-linecap "square">
+
+<!ENTITY accessible "[access] = null and [private] = null">
+<!ENTITY hide SYSTEM "inc.hide.xml">
+<!ENTITY fonts SYSTEM "inc.fonts.xml">
+<!ENTITY natural SYSTEM "inc.natural.xml">
+
+<!ENTITY railway SYSTEM "inc.railway.xml">
+<!ENTITY railway-tunnels SYSTEM "inc.railway-tunnels.xml">
+
+<!ENTITY tunnels-casing-open SYSTEM "inc.highways-casing-open.xml">
+<!ENTITY tunnels-casing-closed SYSTEM "inc.highways-casing-closed.xml">
+<!ENTITY tunnels-fill SYSTEM "inc.highways-fill.xml">
+<!ENTITY highways-casing-open SYSTEM "inc.highways-casing-open.xml">
+<!ENTITY highways-casing-closed SYSTEM "inc.highways-casing-closed.xml">
+<!ENTITY highways-fill-open SYSTEM "inc.highways-fill-open.xml">
+<!ENTITY highways-fill-closed SYSTEM "inc.highways-fill-closed.xml">
+
+<!ENTITY paths SYSTEM "inc.paths.xml">
+
+<!ENTITY names SYSTEM "inc.names.xml">
