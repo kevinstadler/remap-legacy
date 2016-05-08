@@ -1,0 +1,5 @@
+#!/bin/sh
+if [ $# -ne 1 ]; then
+  echo "Usage: download-named-streets <area-name>"
+fi
+`dirname $0`/overpass-area "$1" "named-streets" "(way(area)[highway][name];>;)"

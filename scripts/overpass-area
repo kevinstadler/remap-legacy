@@ -1,0 +1,13 @@
+#!/bin/sh
+if [ $# -ne 3 ]; then
+  echo "Usage: overpass-region <region> <file-suffix> <query>"
+  exit 1
+fi
+
+if [ "$1" -eq "$1" ] 2>/dev/null; then
+  AREA="id:$1"
+else
+  AREA="name=\"$1\""
+fi
+
+`dirname $0`/overpass "${1}-${2}.osm" "area[$AREA];$3;out meta;"

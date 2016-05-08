@@ -35,4 +35,6 @@
 
 <!ENTITY paths SYSTEM "inc.paths.xml">
 
+<!ENTITY name-transform "none"><!-- uppercase -->
+<!ENTITY name SYSTEM "inc.name.xml">
 <!ENTITY names SYSTEM "inc.names.xml">

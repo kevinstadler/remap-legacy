@@ -35,7 +35,7 @@ parser.add_argument('-o', '--output', default='remap.pdf', help='output filename
 args = vars(parser.parse_args())
 
 # resized later, initial size only matters for the resolution of the centering
-m = Map(1000, 1000)
+m = Map(5000, 5000)
 load_map(m, args['style'])
 
 if args['scale'] == None:
@@ -47,6 +47,7 @@ if args['scale'] == None:
   except KeyError:
     print 'No scale specified, gonna make a guess.'
 
+print 'loading', args['osmfile']
 ds = Osm(file=args['osmfile'])
 
 def addlayer(name):
@@ -74,38 +75,24 @@ if args['names']:
   addlayer('highways-names')
 #  addlayer('tunnels-names')
 
+
 m.zoom_all()
-mapcenter = m.envelope().center()
 
-print 'The center of the extent of the OSM map data is:'
-print mapcenter
+if args['longitude'] == None:
+  args['longitude'] = m.layers[0].envelope().center()[0]
+if args['latitude'] == None:
+  args['latitude'] = m.layers[0].envelope().center()[1]
 
-if args['longitude'] != None:
-  mapcenter.x = args['longitude']
-if args['latitude'] != None:
-  mapcenter.y = args['latitude']
-
-if (args['longitude'] != None) | (args['latitude'] != None):
-  # m.pan(0, 0) sets center to northwestern-most point of the current envelope
-  m.pan(int(m.width*(.5-(m.envelope().center().x-mapcenter.x)/m.envelope().width())), int(m.height*(.5+(m.envelope().center().y-mapcenter.y)/m.envelope().height())))
-  print "Shifting map center based on command line arguments, target:"
-  print mapcenter
-
-print "Map center is at:"
-mapcenter = m.envelope().center()
-print mapcenter
+print 'map center is at', args['longitude'], '/', args['latitude']
 
 # default: +axis=enu (east, north, up), south up: +axis=wsu (west, south, up)
 up = {'N': 'enu', 'E': 'seu', 'S': 'wsu', 'W': 'nwu'}
 if args['up'] != 'N':
   args['srs'] += ' +axis=' + up[args['up']]
 
-digits = 4
-m.srs = args['srs'] + ' +lon_0=' + str(round(mapcenter.x, digits)) + ' +lat_0=' + str(round(mapcenter.y, digits))
+displaydigits = 4
+m.srs = args['srs'] + ' +lon_0=' + str(round(args['longitude'], displaydigits)) + ' +lat_0=' + str(round(args['latitude'], displaydigits))
 
-print
-print "Aligning projection with map center:"
-print m.srs
 
 if args['format'] == "a0":
   fontsize = 10
@@ -114,7 +101,7 @@ else:
 
 if args['landscape']:
   args['format'] += "l"
-else:
+elif args['portrait'] == None:
   # make a guess at whether the dataset is more high or wide
   ratio = pi*m.layers[0].envelope().width()*degrees(cos(radians(m.layers[0].envelope().height())))/180 / m.layers[0].envelope().height()
   print "Width-to-height ratio of the dataset is", ratio
@@ -128,7 +115,7 @@ pagesize = printing.pagesizes[args['format']]
 # 1 pixel == 0.28 mm == 0.00028 m
 pixelperm = 3571 # http://www.britishideas.com/2009/09/22/map-scales-and-printing-with-mapnik/
 
-m.resize(int(pixelperm*printing.pagesizes[args['format']][0]), int(pixelperm*printing.pagesizes[args['format']][1]))
+m.resize(int(pixelperm*pagesize[0]), int(pixelperm*pagesize[1]))
 #print "Map size is now", m.width, "by", m.height
 
 # TODO:
@@ -137,11 +124,10 @@ m.resize(int(pixelperm*printing.pagesizes[args['format']][0]), int(pixelperm*pri
 
 m.zoom(args['scale'] / m.scale_denominator())
 
-print "Final scale = " , m.scale(), " 1 :", m.scale_denominator(), "printed on", args['format']
-
 # write to PDF
 surface = printing.PDFPrinter(pagesize=pagesize, margin=args['margin'], resolution=args['dpi'], centering=printing.centering.both, scale=lambda(s):round(s,-1))#printing.any_scale
 
+print 'writing map at scale 1:' + str(m.scale_denominator())
 surface.render_map(m, args['output'])
 
 

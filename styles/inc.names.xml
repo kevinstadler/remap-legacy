@@ -1,8 +1,7 @@
-<!-- TODO 'wrap-width' argument -->
 <Style name="bridges-names">
 	<Rule>
 		<Filter>[bridge] != null and [highway] != null and [name] != null</Filter>
-		<TextSymbolizer fontset-name="book-fonts" size="8" fill="#000" halo-radius="0" placement="line">[name]</TextSymbolizer><!-- text-transform="uppercase" spacing="1" /-->
+		&name;
 	</Rule>
 </Style>
 
@@ -13,13 +12,13 @@
 	</Rule>
 	<Rule>
 		<Filter>[bridge] = null and [tunnel] = null and [highway] != null and [name] != null</Filter>
-		<TextSymbolizer fontset-name="book-fonts" size="8" fill="#000" halo-radius="0" placement="line">[name]</TextSymbolizer><!-- text-transform="uppercase" spacing="1" /-->
+		&name;
 	</Rule>
 </Style>
 
 <Style name="natural-names">
 	<Rule>
 		<Filter>[natural] != null and [name] != null</Filter>
-		<TextSymbolizer fontset-name="book-fonts" size="8" fill="#000" halo-radius="0">[name]</TextSymbolizer><!-- text-transform="uppercase" spacing="1" /-->
+		&name;
 	</Rule>
 </Style>
