@@ -1,26 +1,26 @@
 #!/usr/bin/env python2
-from math import ceil, cos, degrees, pi, radians
+from math import cos, degrees, pi, radians
 from mapnik import *
 from pango import ALIGN_CENTER, ALIGN_RIGHT
 import cairo
 import argparse
 
 parser = argparse.ArgumentParser(description='Renders OSM data to PDF using a Mapnik stylesheet')
-parser.add_argument('osmfile', help='The OSM data file(s)', nargs='+')
+parser.add_argument('osmfile', help='OSM data file to be rendered')
 parser.add_argument('-x', '--style', default='styles/remap.xml', help='Mapnik XML style file')
 parser.add_argument('-s', '--scale', type=float, help='Map scale denominator (i.e. render map as 1:x)')
 parser.add_argument('-lon', '--longitude', type=float, help='Map center longitude (e.g. -3.1977)')
 parser.add_argument('-lat', '--latitude', type=float, help='Map center latitude (e.g. 55.9486)')
 parser.add_argument('--srs', default="+proj=ortho", help='Projection to be used (proj.4 string, default: +proj=ortho)')
+parser.add_argument('--up', default='N', choices=['N', 'S', 'E', 'W'], help='"up" orientation of map (N, S, E or W). this will add an +axis option to the srs proj.4 string')
 
 parser.add_argument('-w', '--water', action='store_true', help='Render water and other natural bodies?')
 parser.add_argument('-r', '--railways', action='store_true', help='Render railways?')
 parser.add_argument('-n', '--names', action='store_true', help='Render names?')
 
 parser.add_argument('-i', '--include-scale', action='store_true', help='Add scale and projection information to the map')
-parser.add_argument('-u', '--url', action='store_true', help='Add remap url to the map')
-parser.add_argument('-c', '--copyright', action='store_true', help='Add copyright information to the map')
-parser.add_argument('-g', '--grid', action='store_true', help='Add red meridian/parallel lines to the map')
+parser.add_argument('-c', '--copyright', action='store_true', help='add copyright information and url to the map')
+parser.add_argument('-g', '--grid', action='store_true', help='add red meridian/parallel lines to the map (only correct with north-up)')
 
 #parser.add_argument('-w', '--width', type=float, help='Output file width (in m)')
 #parser.add_argument('-t', '--height', type=float, help='Output file height (in m)')
@@ -28,41 +28,32 @@ parser.add_argument('-f', '--format', default='a0', help='Cairo target page form
 arrangement = parser.add_mutually_exclusive_group()
 arrangement.add_argument('-l', '--landscape', action='store_true', help='When rendering to a target page format, use landscape orientation? (default)')
 arrangement.add_argument('-p', '--portrait', action='store_true', help='When rendering to a target page format, use portrait orientation?')
-parser.add_argument('-m', '--margin', type=float, default=0, help='Page margin in m (default 0)')
+parser.add_argument('-m', '--margin', type=float, default=0, help='page margin in meters (default 0)')
 #parser.add_argument('-b', '--border', action='store_true', help='Fill margin area black')
-parser.add_argument('-d', '--dpi', type=int, default=72, help='Target pdf resolution (default 72)')
-parser.add_argument('-o', '--output', default='mymap.pdf', help='Output filename (default mymap.pdf)')
+parser.add_argument('-d', '--dpi', type=int, default=72, help='target pdf resolution (default 72)')
+parser.add_argument('-o', '--output', default='remap.pdf', help='output filename (default remap.pdf)')
 args = vars(parser.parse_args())
-
-if len(args['osmfile']) > 1:
-  print 'Passed more than one osm file, switching to twocities overlay-style.'
-  print 'Map will be scaled dynamically so as to fit the *first* dataset.'
-  args['style'] = 'styles/twocities.xml'
-
-ds = Osm(file=args['osmfile'][0])
 
 # resized later, initial size only matters for the resolution of the centering
 m = Map(1000, 1000)
 load_map(m, args['style'])
 
 if args['scale'] == None:
-  scale = m.find_style("scale")
-  if (scale != None):
-    print "Recommended scale for", args['style'], "is between", scale.rules[0].min_scale, "and", scale.rules[0].max_scale
-    args['scale'] = scale.rules[0].min_scale
+  try:
+    scale = m.find_style('scale')
+    if (scale != None):
+      print "Recommended scale for", args['style'], "is between", scale.rules[0].min_scale, "and", scale.rules[0].max_scale
+      args['scale'] = scale.rules[0].min_scale
+  except KeyError:
+    print 'No scale specified, gonna make a guess.'
+
+ds = Osm(file=args['osmfile'])
 
 def addlayer(name):
-#  if (m.find_style(name)):
   layer = Layer(name)
   layer.datasource = ds
   layer.styles.append(name)
   m.layers.append(layer)
-
-#layer = Layer('l')
-#layer.datasource = ds
-#for style in ['highways-casing', 'highways-fill']:
-#  layer.styles.append(style)
-#m.layers.append(layer)
 
 addlayer('tunnels-casing')
 addlayer('tunnels-fill')
@@ -99,13 +90,21 @@ if (args['longitude'] != None) | (args['latitude'] != None):
   m.pan(int(m.width*(.5-(m.envelope().center().x-mapcenter.x)/m.envelope().width())), int(m.height*(.5+(m.envelope().center().y-mapcenter.y)/m.envelope().height())))
   print "Shifting map center based on command line arguments, target:"
   print mapcenter
-  print "Map center is now at:"
-  mapcenter = m.envelope().center()
-  print mapcenter
+
+print "Map center is at:"
+mapcenter = m.envelope().center()
+print mapcenter
+
+# default: +axis=enu (east, north, up), south up: +axis=wsu (west, south, up)
+up = {'N': 'enu', 'E': 'seu', 'S': 'wsu', 'W': 'nwu'}
+if args['up'] != 'N':
+  args['srs'] += ' +axis=' + up[args['up']]
 
 digits = 4
-m.srs = args['srs'] + ' +lon_0=' + str(round(mapcenter.x, 4)) + ' +lat_0=' + str(round(mapcenter.y, 4))
-print "Aligning orthographic projection with map center:"
+m.srs = args['srs'] + ' +lon_0=' + str(round(mapcenter.x, digits)) + ' +lat_0=' + str(round(mapcenter.y, digits))
+
+print
+print "Aligning projection with map center:"
 print m.srs
 
 if args['format'] == "a0":
@@ -123,7 +122,6 @@ else:
     args['format'] += "l"
 
 pagesize = printing.pagesizes[args['format']]
-print pagesize
 
 # 1 point == 1/72.0 inch
 #pointspercm = 28.3464
@@ -132,6 +130,11 @@ pixelperm = 3571 # http://www.britishideas.com/2009/09/22/map-scales-and-printin
 
 m.resize(int(pixelperm*printing.pagesizes[args['format']][0]), int(pixelperm*printing.pagesizes[args['format']][1]))
 #print "Map size is now", m.width, "by", m.height
+
+# TODO:
+#if args['scale'] == None:
+#print 'No scale specified, dynamic scale that fits the full extent of all data on the target page format is 1:' + str(m.scale_denominator())
+
 m.zoom(args['scale'] / m.scale_denominator())
 
 print "Final scale = " , m.scale(), " 1 :", m.scale_denominator(), "printed on", args['format']
@@ -144,13 +147,19 @@ surface.render_map(m, args['output'])
 
 # add annotations
 
+if args['grid']: # red lat/lon grid
+  surface.render_on_map_lat_lon_grid(m)
+
 ctx = surface.get_context()
+# could also find fontset from style file
+#fonts = m.find_fontset('fonts')
+#if (fonts != None):
+#  print m.find_fontset('book-fonts').names[0]
 ctx.select_font_face("DejaVu Mono", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 ctx.set_font_size(fontsize)
 
 def addline(txt):
   extent = ctx.text_extents(txt)
-  print(extent)
   ctx.show_text(txt)
   ctx.rel_move_to(-extent[4], 1.5*extent[3])
 
@@ -161,14 +170,9 @@ if args['include_scale']:
   ctx.rel_move_to(0, scale[1])
   addline(m.srs)
 
-if args['url']:
-  addline("http://github.com/kevinstadler/remap")
-
 if args['copyright']:
   addline("(c) OpenStreetMap contributors / The Residents Association")
-
-if args['grid']: # red lat/lon grid
-  surface.render_on_map_lat_lon_grid(m)
+  addline("http://github.com/kevinstadler/remap")
 
 #surface.render_legend(m, attribution={"highway-fills": "foo"})
 surface.finish()
