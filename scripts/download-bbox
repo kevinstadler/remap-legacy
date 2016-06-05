@@ -1,0 +1,13 @@
+#!/bin/sh
+if [ $# -eq 4 ];
+  STR="$1,$2,$3,$4"
+else if [ $# -eq 1 ];
+  STR="$1"
+else
+  echo "Usage: download-bbox <left>,<bottom>,<top>,<right>"
+fi
+wget -O "bbox-${STR}.osm" http://overpass-api.de/api/map?bbox=$STR #http://api.openstreetmap.org/api/0.6/map?bbox=$STR
+
+# for requests larger than 0.25 square degrees (e.g. 0.5 x 0.5 degrees):
+# XAPI query for up to 100 square degrees (or up to 10,000,000 elements)
+#http://overpass.osm.rambler.ru/cgi/xapi_meta?*[bbox=11.5,48.1,11.6,48.2]

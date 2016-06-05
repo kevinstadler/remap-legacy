@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
+from argparse import ArgumentParser
 from math import cos, degrees, pi, radians
 from mapnik import *
-from pango import ALIGN_CENTER, ALIGN_RIGHT
 import cairo
-import argparse
+import os.path
 
-parser = argparse.ArgumentParser(description='Renders OSM data to PDF using a Mapnik stylesheet')
+parser = ArgumentParser(description='Renders OSM data to PDF using a Mapnik stylesheet')
 parser.add_argument('osmfile', help='OSM data file to be rendered')
 parser.add_argument('-x', '--style', default='styles/remap.xml', help='Mapnik XML style file')
 parser.add_argument('-s', '--scale', type=float, help='Map scale denominator (i.e. render map as 1:x)')
@@ -14,25 +14,31 @@ parser.add_argument('-lat', '--latitude', type=float, help='Map center latitude 
 parser.add_argument('--srs', default="+proj=ortho", help='Projection to be used (proj.4 string, default: +proj=ortho)')
 parser.add_argument('--up', default='N', choices=['N', 'S', 'E', 'W'], help='"up" orientation of map (N, S, E or W). this will add an +axis option to the srs proj.4 string')
 
-parser.add_argument('-w', '--water', action='store_true', help='Render water and other natural bodies?')
+parser.add_argument('-w', '--water', action='store_true', help='render water and other natural bodies?')
 parser.add_argument('-r', '--railways', action='store_true', help='Render railways?')
 parser.add_argument('-n', '--names', action='store_true', help='Render names?')
 
 parser.add_argument('-i', '--include-scale', action='store_true', help='Add scale and projection information to the map')
 parser.add_argument('-c', '--copyright', action='store_true', help='add copyright information and url to the map')
+# TODO choose pleasant font size between 6 and 10pt, depending on output file size
+parser.add_argument('--fontsize', type=int, default=10, help='font size used for additional information')
 parser.add_argument('-g', '--grid', action='store_true', help='add red meridian/parallel lines to the map (only correct with north-up)')
 
-#parser.add_argument('-w', '--width', type=float, help='Output file width (in m)')
-#parser.add_argument('-t', '--height', type=float, help='Output file height (in m)')
 parser.add_argument('-f', '--format', default='a0', help='Cairo target page format (default a0)')
 arrangement = parser.add_mutually_exclusive_group()
 arrangement.add_argument('-l', '--landscape', action='store_true', help='When rendering to a target page format, use landscape orientation? (default)')
 arrangement.add_argument('-p', '--portrait', action='store_true', help='When rendering to a target page format, use portrait orientation?')
+
+parser.add_argument('--width', type=float, help='output file width in meters (overrides --format)')
+parser.add_argument('--height', type=float, help='output file height in meters (overrides --format)')
 parser.add_argument('-m', '--margin', type=float, default=0, help='page margin in meters (default 0)')
 #parser.add_argument('-b', '--border', action='store_true', help='Fill margin area black')
 parser.add_argument('-d', '--dpi', type=int, default=72, help='target pdf resolution (default 72)')
 parser.add_argument('-o', '--output', default='remap.pdf', help='output filename (default remap.pdf)')
 args = vars(parser.parse_args())
+
+if os.path.exists('styles/' + args['style'] + '.xml'):
+  args['style'] = 'styles/' + args['style'] + '.xml'
 
 # resized later, initial size only matters for the resolution of the centering
 m = Map(5000, 5000)
@@ -51,37 +57,47 @@ print 'loading', args['osmfile']
 ds = Osm(file=args['osmfile'])
 
 def addlayer(name):
-  layer = Layer(name)
-  layer.datasource = ds
-  layer.styles.append(name)
-  m.layers.append(layer)
+  try:
+    m.find_style(name)
+    layer = Layer(name)
+    layer.datasource = ds
+    layer.styles.append(name)
+    m.layers.append(layer)
+  except KeyError:
+    None
 
 addlayer('tunnels-casing')
 addlayer('tunnels-fill')
-#if args['railways']:
-#  addlayer('railway-tunnels')
+if args['railways']:
+  addlayer('railway-tunnels')
 if args['water']:
   addlayer('natural')
+
 addlayer('highways-casing')
 addlayer('highways-fill')
-#if args['railways']:
-#  addlayer('railway')
+if args['railways']:
+  addlayer('railway')
+
 addlayer('bridges-casing')
 addlayer('bridges-fill')
-#if args['railways']:
-#  addlayer('railway-bridges')
+if args['railways']:
+  addlayer('railway-bridges')
+
 if args['names']:
   addlayer('bridges-names')
   addlayer('highways-names')
-#  addlayer('tunnels-names')
-
+  addlayer('tunnels-names')
+  if args['water']:
+    addlayer('natural-names')
+  if args['railways']:
+    addlayer('railway-names')
 
 m.zoom_all()
 
 if args['longitude'] == None:
-  args['longitude'] = m.layers[0].envelope().center()[0]
+  args['longitude'] = m.layers[0].envelope().center().x
 if args['latitude'] == None:
-  args['latitude'] = m.layers[0].envelope().center()[1]
+  args['latitude'] = m.layers[0].envelope().center().y
 
 print 'map center is at', args['longitude'], '/', args['latitude']
 
@@ -94,11 +110,6 @@ displaydigits = 4
 m.srs = args['srs'] + ' +lon_0=' + str(round(args['longitude'], displaydigits)) + ' +lat_0=' + str(round(args['latitude'], displaydigits))
 
 
-if args['format'] == "a0":
-  fontsize = 10
-else:
-  fontsize = 6
-
 if args['landscape']:
   args['format'] += "l"
 elif args['portrait'] == None:
@@ -108,7 +119,14 @@ elif args['portrait'] == None:
   if ratio > 1:
     args['format'] += "l"
 
-pagesize = printing.pagesizes[args['format']]
+# if only one set, make square
+args['width'] = args['width'] or args['height']
+args['height'] = args['height'] or args['width']
+# --width/--height override --format
+if args['width']:
+  pagesize = (args['width'], args['height'])
+else:
+  pagesize = printing.pagesizes[args['format']]
 
 # 1 point == 1/72.0 inch
 #pointspercm = 28.3464
@@ -116,7 +134,6 @@ pagesize = printing.pagesizes[args['format']]
 pixelperm = 3571 # http://www.britishideas.com/2009/09/22/map-scales-and-printing-with-mapnik/
 
 m.resize(int(pixelperm*pagesize[0]), int(pixelperm*pagesize[1]))
-#print "Map size is now", m.width, "by", m.height
 
 # TODO:
 #if args['scale'] == None:
@@ -142,7 +159,7 @@ ctx = surface.get_context()
 #if (fonts != None):
 #  print m.find_fontset('book-fonts').names[0]
 ctx.select_font_face("DejaVu Mono", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-ctx.set_font_size(fontsize)
+ctx.set_font_size(args['fontsize'])
 
 def addline(txt):
   extent = ctx.text_extents(txt)
@@ -163,3 +180,4 @@ if args['copyright']:
 #surface.render_legend(m, attribution={"highway-fills": "foo"})
 surface.finish()
 #add_geospatial_pdf_header(, m, args['output'], wkt=)
+print 'successfully wrote to', args['output']

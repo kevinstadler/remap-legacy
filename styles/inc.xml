@@ -35,6 +35,10 @@
 
 <!ENTITY paths SYSTEM "inc.paths.xml">
 
-<!ENTITY name-transform "none"><!-- uppercase -->
+<!ENTITY name-transform "none">
+<!ENTITY font-size "7">
 <!ENTITY name SYSTEM "inc.name.xml">
 <!ENTITY names SYSTEM "inc.names.xml">
+
+<!ENTITY bridge "([bridge] != null and [bridge] != 'no')">
+<!ENTITY tunnel "([tunnel] != null and [tunnel] != 'no')">

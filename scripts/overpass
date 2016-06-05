@@ -4,4 +4,9 @@ if [ $# -ne 2 ]; then
   exit 1
 fi
 
+if [ -f "$1" ]; then
+  echo "Error: $1 already exists"
+  exit 1
+fi
+
 time -f "Total time (wait+download): %E" wget -O "$1" "http://overpass.osm.rambler.ru/cgi/interpreter?data=$2"

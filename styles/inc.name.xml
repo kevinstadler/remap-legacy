@@ -1,1 +1,1 @@
-<TextSymbolizer fontset-name="book-fonts" size="7" fill="&closed-casing-stroke;" halo-radius="0" placement="line" text-transform="&name-transform;">[name]</TextSymbolizer><!-- spacing="1" /-->
+<TextSymbolizer fontset-name="book-fonts" size="&font-size;" fill="&closed-casing-stroke;" halo-radius="0" placement="line" text-transform="&name-transform;">[name]</TextSymbolizer><!-- spacing="1" /-->
