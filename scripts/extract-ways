@@ -1,0 +1,10 @@
+#!/bin/sh
+if [ $# -ne 1 ]; then
+  echo "Usage: extract-ways <osm-data-file>"
+  exit 1
+fi
+FILE="$1"
+#osmconvert "$FILE" -o="$FILE.o5m"
+echo "Extracting all ways from $1"
+time osmfilter "$FILE" --keep-ways="highway= or waterway=" --keep-nodes= --keep-relations= -o="`basename $1 .osm`-ways.osm"
+#osmfilter "$FILE" --drop-nodes --drop-relations -o="streets.osm"

@@ -1,0 +1,2 @@
+#!/bin/sh
+pdfposter -s0.99 -mA3 "$1" "`basename $1 .pdf`-split.pdf"

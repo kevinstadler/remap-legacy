@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Map [
+<!ENTITY % entities SYSTEM "inc.xml">
+%entities;
+<!ENTITY minscale "4000">
+<!ENTITY maxscale "8000">
+<!ENTITY scale SYSTEM "inc.scale.xml">
+]>
+
+<Map background-color="#fff">
+    &fonts;
+    &scale;
+    <Style name="tunnels-casing">
+        <Rule><Filter>[highway] = 'steps' and [tunnel] != null</Filter>
+            &hide;
+        </Rule>
+        &highways-casing-closed;
+        &default-casing;
+    </Style>
+
+    <Style name="tunnels-fill">
+        <Rule><Filter>[highway] = 'steps' and [tunnel] != null</Filter>
+            &hide;
+        </Rule>
+
+        &railway-tunnels;
+        <!-- ignore unnamed ways --> <!-- TODO ignore platforms too? -->
+        <Rule><Filter>[highway] = null or ([name] = null and [name:left] = null and [name:right] = null)</Filter>
+            &hide;
+        </Rule>
+        &highways-fill-closed;
+        &default-fill;
+    </Style>
+
+    <Style name="natural">
+        &natural;
+    </Style>
+
+    <Style name="highways-casing">
+        <Rule><Filter>[highway] = null or ([name] = null and [name:left] = null and [name:right] = null) or [tunnel] != null or [bridge] != null</Filter>
+            &hide;
+        </Rule>
+        &highways-casing-closed;
+        &default-casing;
+    </Style>
+
+    <Style name="highways-fill">
+        <Rule><Filter>[tunnel] != null or [bridge] != null</Filter>
+            &hide;
+        </Rule>
+
+        &railway;
+
+        &highways-fill-closed;
+        &default-fill;
+    </Style>
+
+    <Style name="bridges-casing">
+        &highways-casing-open;
+        &default-casing;
+    </Style>
+
+    <Style name="bridges-fill">
+        <Rule><Filter>[bridge] = null</Filter>
+            &hide;
+        </Rule>
+        &railway;
+
+        &highways-fill-open;
+        &default-fill;
+    </Style>
+
+<!-- TODO names -->
+    &names;
+</Map>

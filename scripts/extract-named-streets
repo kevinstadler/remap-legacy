@@ -1,0 +1,15 @@
+#!/bin/sh
+if [ $# -ne 1 ]; then
+  echo "Usage: extract-named-streets <osm-data-file>"
+  exit 1
+fi
+FILE="$1"
+#osmconvert "$FILE" -o="$FILE.o5m"
+echo "Extracting all data on named streets to streets.osm"
+time osmfilter "$FILE" --keep-ways="highway= and name=" --keep-nodes= -o="streets.osm"
+#time osmfilter "$FILE" --drop-ways="not(highway=) and name=" --keep-nodes= -o="streets.osm"
+#osmfilter "$FILE" --drop-nodes --drop-relations -o="streets.osm"
+echo "Extracting street names and writing them to streets.csv"
+# add @id tag if there are actually distinct ways with the same name
+time osmconvert streets.osm --drop-nodes --drop-relations --csv="name @id" | sort | uniq > streets.csv
+echo "Found `cat streets.csv | wc -l` street names (may contain duplicates)"

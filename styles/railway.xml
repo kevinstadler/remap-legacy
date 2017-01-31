@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Map [
+<!ENTITY % entities SYSTEM "inc.xml">
+%entities;
+<!ENTITY minscale "3750">
+<!ENTITY maxscale "10000">
+<!ENTITY scale SYSTEM "inc.scale.xml">
+
+<!ENTITY active "[service] = null">
+]>
+
+<!-- renders all railways by default - adding the 'railways' layers also renders undergrounds on top of normal rail -->
+
+<Map background-color="#fff">
+	&fonts;
+	&scale;
+	<Style name="tunnels-casing">
+		<Rule>
+			<Filter>[railway] = 'rail' and &tunnel; and &active;</Filter>
+			<LineSymbolizer stroke-linejoin="round" stroke="&railway-stroke;" stroke-width="1" />
+			<LineSymbolizer stroke-linejoin="round" stroke="#fff" stroke-width="1" stroke-dasharray="8,12" />
+		</Rule>
+	</Style>
+
+	<Style name="railway-tunnels">
+		<Rule>
+			<Filter>[railway] = 'subway' and &tunnel; and &active;</Filter>
+			<LineSymbolizer stroke-linejoin="round" stroke="&railway-stroke;" stroke-width="1" />
+		</Rule>
+	</Style>
+
+	&natural;
+
+	<Style name="highways-casing" filter-mode="first">
+		<Rule>
+			<Filter>[railway] = 'rail' and (not &bridge;) and (not &tunnel;) and &active;</Filter>
+			<LineSymbolizer stroke-linejoin="round" stroke="&railway-stroke;" stroke-width="1" />
+			<LineSymbolizer stroke-linejoin="round" stroke="#fff" stroke-width="1" stroke-dasharray="8,12" />
+		</Rule>
+	</Style>
+
+	<Style name="railway">
+		<Rule>
+			<Filter>[railway] = 'subway' and (not &bridge;) and (not &tunnel;) and &active;</Filter>
+			<LineSymbolizer stroke-linejoin="round" stroke="&railway-stroke;" stroke-width="1" />
+		</Rule>
+	</Style>
+
+	<Style name="bridges-casing">
+		<Rule><Filter>[railway] = 'rail' and &bridge; and &active;</Filter>
+			<LineSymbolizer stroke-linejoin="round" stroke="&railway-stroke;" stroke-width="1" />
+			<LineSymbolizer stroke-linejoin="round" stroke="#fff" stroke-width="1" stroke-dasharray="8,12" />
+		</Rule>
+		<Rule><Filter>[building] = 'train_station' or [railway] = 'train_station'</Filter>
+			<PolygonSymbolizer fill="#00f" />
+		</Rule>
+		<!-- [public_transport] = 'platform' or [railway] = 'platform' -->
+	</Style>
+
+	<Style name="railway-bridges">
+		<Rule>
+			<Filter>[railway] = 'subway' and &bridge; and &active;</Filter>
+			<LineSymbolizer stroke-linejoin="round" stroke="&railway-stroke;" stroke-width="1" />
+		</Rule>
+		<!-- that should just be underground, *not* train stations? -->
+		<Rule><Filter>[railway] = 'station'</Filter>
+			<PolygonSymbolizer fill="#f00" />
+			<!-- PointSymbolizer -->
+		</Rule>
+	</Style>
+
+	<Style name="highways-names">
+		<Rule>
+			<Filter>([building] = 'train_station' or [railway] = 'station') and [name] != null</Filter>
+			&name;
+		</Rule>
+	</Style>
+</Map>

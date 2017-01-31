@@ -1,0 +1,5 @@
+#!/bin/sh
+if [ $# -ne 1 ]; then
+  echo "Usage: download-ways <area-name>"
+fi
+`dirname $0`/overpass-area "$1" "ways" "(way(area);>;)"

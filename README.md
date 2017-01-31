@@ -1,3 +1,9 @@
+> **this repository is no longer maintained**
+
+Unless you are for some reason limited to mapnik v2.3 and/or rendering directly from `.osm` files, this repository is mainly for reference. The successor project (based on mapnik v3 and postGIS) can be found [here](https://github.com/kevinstadler/remap)
+
+---
+
 # re:map
 
 [mapnik](http://mapnik.org/) styles and python scripts developed for and by [The Residents Association](http://theresidentsassociation.tumblr.com)
@@ -8,27 +14,21 @@
 * `remap.py`: a python script that allows easy and flexible rendering of .osm files
 * `overlay.py`: a python script for overlaying several .osm files translated on top of each other
 
+see also the [examples](examples) directory
+
 ## remap.py
 
-    # make a nice big A0 map
-    ./remap.py -cirw -lon -3.1977 -lat 55.9486 Edinburgh.osm
-
-    # make a wee pocket map (don't plot water/other natural bodies)
-    ./remap.py -cir --scale 6000 -f a4 -lon -3.1947 -lat 55.9486 Edinburgh.osm
-
-    # include names
-    ./remap.py -inrw --scale 10700 -f a5 --landscape -lon -89.8722 -lat 30.7745 Bogalusa.osm
-    ./remap.py -inrw --scale 2200 -f a5 --landscape -lon -3.1935 -lat 55.9486 Edinburgh.osm
+```
+EXAMPLES
+```
 
 ## overlay.py
 
 `overlay.py` takes several .osm files as arguments, and some of its options (`-lat`, `-lon`, `-up`, `-col`) can take as many arguments as there are .osm files. to stop the options from eating up all following arguments it is wise to specify the .osm files first (see also the help below)
 
-    # default setting draws street grids on top of each other
-    ./overlay.py -i -n --scale 8000 Edinburgh.osm London.osm -lat 55.9385 51.5465 -lon -3.1916 -.2326 -col "#6c6" "#c88"
-
-    # draw a north-up and south-up Edinburgh on top of each other, with the rotation/flipping centered on the castle
-    ./overlay.py Edinburgh.osm Edinburgh.osm -lon -3.1947 -lat 55.9486 --up N S
+```
+EXAMPLES
+```
 
 neatly packaged metropolitan data sets are available at https://mapzen.com/data/metro-extracts/
 
@@ -38,7 +38,7 @@ as `ob_tran` assumes a spherical earth and the osm files are presumably in WGS84
 
 ## dependencies
 
-mapnik and mapnik-python (at least version 2.3) from the [PPA](https://launchpad.net/~mapnik/+archive/ubuntu/nightly-2.3/+packages)
+`mapnik` and `mapnik-python` (at least version 2.3) from the [PPA](https://launchpad.net/~mapnik/+archive/ubuntu/nightly-2.3/+packages). depending on what files you want to render you'll also need `mapnik-input-plugin-osm` and/or `mapnik-input-plugin-ogr`
 
 ## todos
 
